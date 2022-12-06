@@ -1,0 +1,16 @@
+# ninja log v5
+2	1091	6920242695467938	CMakeFiles/untitled.dir/main.cpp.obj	d2f65db34c06df0e
+6	564	6920242690206776	CMakeFiles/untitled.dir/ScoreCard.cpp.obj	e36d206cc26762f1
+1091	1203	6920242696568219	untitled.exe	b81ad8cb5dd759d4
+22	182	6919489995769046	CMakeFiles/untitled.dir/Lotto.cpp.obj	55db206ce23de87b
+6	58	6920235515633024	CMakeFiles/untitled.dir/Keg.cpp.obj	64d27f46dc736a8f
+6	282	6920237510464319	CMakeFiles/untitled.dir/InputParser.cpp.obj	56f4f934d198a14d
+6	66	6919787195119735	CMakeFiles/untitled.dir/Cell.cpp.obj	8f5cf8b11e0b77fe
+15	189	6919489995869078	CMakeFiles/untitled.dir/BoxWithKegs.cpp.obj	71ca42f716ac84c0
+8	1370	6920119796486746	CMakeFiles/untitled.dir/LottoRandomizer.cpp.obj	c81173693f493a14
+2	469	6919684491516264	CMakeFiles/untitled.dir/tests.cpp.obj	c7ed81a58324fcd6
+1	142	6920104628913630	build.ninja	1241c855cd8320d9
+2	1117	6920243441237550	CMakeFiles/untitled.dir/main.cpp.obj	d2f65db34c06df0e
+1118	1220	6920243442217758	untitled.exe	b81ad8cb5dd759d4
+3	1114	6920243539292231	CMakeFiles/untitled.dir/main.cpp.obj	d2f65db34c06df0e
+1115	1205	6920243540162421	untitled.exe	b81ad8cb5dd759d4
