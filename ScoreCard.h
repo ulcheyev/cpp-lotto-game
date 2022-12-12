@@ -5,10 +5,6 @@
 #ifndef UNTITLED_SCORECARD_H
 #define UNTITLED_SCORECARD_H
 
-
-
-
-
 #include <cstdlib>
 #include <vector>
 #include <ostream>
@@ -16,11 +12,6 @@
 
 class ScoreCard {
 public:
-
-    //whitespace + 2 digits + whitespace
-    const static size_t  THE_QUANTITY_OF_CELL_CHARACTERS = 4;
-
-
 
     ScoreCard() = default;
     ScoreCard(size_t wdh, size_t hgth);

@@ -4,10 +4,8 @@
 
 #include <iomanip>
 #include "ScoreCard.h"
+#include "Constants.h"
 #include "LottoRandomizer.h"
-
-
-
 
 ScoreCard::ScoreCard(size_t wdh, size_t hgth) :width (wdh), height(hgth){
         quantityOfBorders = width + 1;
@@ -52,8 +50,8 @@ std::ostream &operator<<(std::ostream &out, ScoreCard &scoreCard) {
 
         size_t val = scoreCard.cells[idx]->getCellValue();
 
-        const size_t digitsCount = LottoRandomizer::findDigitsCount(val);
-        const size_t W = ScoreCard::THE_QUANTITY_OF_CELL_CHARACTERS - digitsCount + 1;
+//        const size_t digitsCount = LottoRandomizer::findDigitsCount(val);
+//        const size_t W = ScoreCard::THE_QUANTITY_OF_CELL_CHARACTERS - digitsCount + 1;
 
         out<< "|" << std::setw(3);
 

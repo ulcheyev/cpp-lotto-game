@@ -17,36 +17,19 @@
 
 int main() {
 
-    //TODO pole mozhet byt tolko max 40 elementov
-
-    size_t width = 10;
-    size_t height = 3;
-    float fullness = 1;
-
-//    InputParser inputParser;
-//    std::cin >> inputParser;
+    InputParser inputParser;
+    std::cin >> inputParser;
 
     LottoRandomizer lottoRandomizer;
-//    ScoreCard scoreCard = lottoRandomizer.generateScoreCardWithRandomNumbers(
-//            inputParser.getWidth(),
-//            inputParser.getHeight(),
-//            inputParser.getFullness()
-//            );
-
     ScoreCard scoreCard = lottoRandomizer.generateScoreCardWithRandomNumbers(
-            width,
-            height,
-            fullness
-    );
+            inputParser.getWidth(),
+            inputParser.getHeight(),
+            inputParser.getFullness()
+            );
 
 
-    std::cout << scoreCard;
-
-    scoreCard.fillCell(0);
-    scoreCard.fillCell(5);
 
     std::cout << scoreCard;
 
-//    scoreCard.
     return 0;
 }

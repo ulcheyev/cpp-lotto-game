@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "untitled::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-untitled-Debug-9049a1731d7d5c3b98f7.json",
+					"jsonFile" : "target-untitled-Debug-52a535a8f4013340ce38.json",
 					"name" : "untitled",
 					"projectIndex" : 0
 				}
@@ -49,12 +49,12 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/OMEN/Desktop/cvut/cpp_sem/cmake-build-debug",
-		"source" : "C:/Users/OMEN/Desktop/cvut/cpp_sem"
+		"build" : "C:/Users/Yevgeniy/Desktop/cpp_sem/cmake-build-debug",
+		"source" : "C:/Users/Yevgeniy/Desktop/cpp_sem"
 	},
 	"version" : 
 	{
 		"major" : 2,
-		"minor" : 3
+		"minor" : 4
 	}
 }
