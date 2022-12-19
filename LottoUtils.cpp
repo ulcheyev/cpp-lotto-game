@@ -2,13 +2,19 @@
 // Created by Ulchenkov Yevgeniy on 05.12.2022.
 //
 
-#include "LottoRandomizer.h"
+#include "LottoUtils.h"
 #include <vector>
 #include <ctime>
 #include<bits/stdc++.h>
 
+std::random_device LottoUtils::seed;
+std::mt19937 LottoUtils::gen{seed()};
+std::uniform_int_distribution<> LottoUtils::dist{MIN_CELL_NUMBER, MAX_CELL_NUMBER};
+std::vector<size_t> LottoUtils::kegsNumbers;
+std::vector<size_t> LottoUtils::cellsNumbers;
 
-size_t LottoRandomizer::generateNumberForKeg() {
+
+size_t LottoUtils::generateNumberForKeg() {
     size_t num = dist(gen);
     while(true) {
         auto search_res = std::find(kegsNumbers.begin(), kegsNumbers.end(), num);
@@ -22,7 +28,7 @@ size_t LottoRandomizer::generateNumberForKeg() {
 
 
 
-size_t LottoRandomizer::generateNumberForCell() {
+size_t LottoUtils::generateNumberForCell() {
     size_t num = dist(gen);
     while(true) {
         auto search_res = std::find(cellsNumbers.begin(), cellsNumbers.end(), num);
@@ -39,14 +45,14 @@ size_t LottoRandomizer::generateNumberForCell() {
  * MAX = 1 -> 100%
  * MIN = 0.1 -> 10%
  */
-ScoreCard& LottoRandomizer::generateScoreCardWithRandomNumbers(size_t width, size_t height, float fullness) {
+std::unique_ptr<ScoreCard> LottoUtils::generateScoreCardWithRandomNumbers(std::string id, size_t width, size_t height, float fullness) {
     //TODO exception if fullness < 0.1
 
-    auto *scoreCard = new ScoreCard(width,height);
+    std::unique_ptr<ScoreCard> res( new ScoreCard(id, width, height));
 
-    for(size_t height = 0; height < scoreCard->getHeight(); ++height){
+    for(size_t height = 0; height < res->getHeight(); ++height){
 
-        for(size_t width = 0; width < scoreCard->getWidth(); ++width){
+        for(size_t width = 0; width < res->getWidth(); ++width){
             Cell *cell;
             if(yesOrNo(fullness)) {
                 size_t cellNumber = generateNumberForCell();
@@ -54,21 +60,26 @@ ScoreCard& LottoRandomizer::generateScoreCardWithRandomNumbers(size_t width, siz
             }else{
                 cell = new Cell;
             }
-            scoreCard->addCell(cell);
+            res->addCell(cell);
         }
     }
 
-    return *scoreCard;
+    return res;
 }
 
-bool LottoRandomizer::yesOrNo(float probabilityOfYes) {
+bool LottoUtils::yesOrNo(float probabilityOfYes) {
     return rand()%100 < (probabilityOfYes * 100);
 }
 
-size_t LottoRandomizer::findDigitsCount(int number){
+
+size_t LottoUtils::findDigitsCount(int number){
     int digits = 0;
     do
     { number /= 10; digits++; }
     while (number != 0);
     return digits;
 }
+
+
+
+

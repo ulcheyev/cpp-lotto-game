@@ -1,35 +1,13 @@
 #include <iostream>
-#include <sstream>
-#include <vector>
-#include <ctime>
-#include <cstdlib>
-#include <random>
-#include<bits/stdc++.h>
-
-#include "Keg.h"
-#include "ScoreCard.h"
-#include "BoxWithKegs.h"
-#include "InputParser.h"
-#include "LottoRandomizer.h"
-#include "Cell.h"
+#include "Lotto.h"
 
 
 
 int main() {
 
-    InputParser inputParser;
-    std::cin >> inputParser;
-
-    LottoRandomizer lottoRandomizer;
-    ScoreCard scoreCard = lottoRandomizer.generateScoreCardWithRandomNumbers(
-            inputParser.getWidth(),
-            inputParser.getHeight(),
-            inputParser.getFullness()
-            );
-
-
-
-    std::cout << scoreCard;
+    Lotto lotto;
+    lotto.parseInput(std::cin);
+    lotto.play_game(std::cout);
 
     return 0;
 }
