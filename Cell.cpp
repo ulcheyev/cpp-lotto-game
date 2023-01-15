@@ -17,11 +17,4 @@ Cell::Cell(size_t value) {
 }
 
 
-void Cell::fillCell() {
-    filled = true;
-}
-
-bool Cell::getFilled() const {
-    return filled;
-}
 

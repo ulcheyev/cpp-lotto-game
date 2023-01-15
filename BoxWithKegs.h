@@ -8,15 +8,34 @@
 
 #include <vector>
 #include <memory>
+#include "ScoreCard.h"
 
+/**
+ * Class represents the box with kegs.
+ * To speed up the game, numbers are generated from the score card.
+ */
 class BoxWithKegs {
 public:
-    BoxWithKegs();
-    void generateBox();
+    /**
+     * Generate box with numbers, dependent on the numbers of the card.
+     * @param scoreCard specified card
+     */
+    void generateBox(std::unique_ptr<ScoreCard>& scoreCard );
+
+    /**
+     * Return random keg value.
+     * @return random keg value
+     */
     size_t randomKeg();
+
+    /**
+     * Returns true, if box is empty, otherwise false.
+     * @return true, if box is empty
+     */
     bool isEmpty();
+
 private:
-    std::vector<size_t> kegs;
+    std::vector<size_t> kegs;  // kegs numbers
 };
 
 

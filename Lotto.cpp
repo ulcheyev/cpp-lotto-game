@@ -4,10 +4,13 @@
 
 #include "Lotto.h"
 #include <unistd.h>
-#include <iostream>
+#include <thread>
 #include "Constants.h"
+#include "OutputMaker.h"
+
 
 Lotto::Lotto() {
+    printLogo();
     identifyObjects();
 }
 
@@ -17,75 +20,159 @@ void Lotto::identifyObjects(){
     utils = std::make_unique<LottoUtils>();
 }
 
-void Lotto::parseInput(std::istream  &istream) {
+void Lotto::identifyCardData(std::istream  &istream) {
     InputParser *pParser = this->input.get();
-    istream >> *pParser;
-    identifyScoreCard();
+    pParser->parseCardData();
 }
 
 void Lotto::identifyScoreCard() {
-    size_t score_card_numbers = input->getNumberOfPlayers();
-
-    for(auto idx = 0; idx < score_card_numbers; idx++){
-        scoreCards.push_back(utils->generateScoreCardWithRandomNumbers(input->getIdentifiers()[idx],
-                input->getWidth(), input->getHeight(), input->getFullness()
-        ));
-    }
-
+    scoreCard = (
+            utils->generateScoreCardWithRandomNumbers(
+                    input->getWidth(),
+                    input->getHeight())
+    );
+    box->generateBox(scoreCard);
 }
 
 
-
-void Lotto::print(std::ostream &out, std::string & str) {
-    out << std::endl << str << std::endl;
+void Lotto::play_game() {
+    printOne(PLAY_HEADER);
+    identifyScoreCard();
+    closeNumbers();
 }
 
-
-void Lotto::play_game(std::ostream &out) {
-
-    print(out, PLAY_HEADER);
-    sleep(1);
-    handleCards();
-
-    while(true){
-        if(box->isEmpty()){ break; isFinished = true;}
-        for(auto& card: scoreCards){
-            makeTurn(card);
+std::string Lotto::getPlayerMatchNumbers(std::vector<size_t> &nums) {
+    std::vector<size_t> match;
+    for(auto num: nums){
+        if(LottoUtils::checkContainingElement(win_numbers, num)){
+            match.push_back(num) ;
         }
     }
+    return LottoUtils::vecToString(match);
 }
 
-void Lotto::makeTurn(std::unique_ptr<ScoreCard>& card) {
-    std::string id = card->getIdentifier();
 
-    std::cout << std::endl << "***Player " <<  id << " makes turn***" << std::endl;
-    input->parseTurn(id);
-    size_t kegNumber = box->randomKeg();
 
-    try{
-        size_t res = card->searchCell(kegNumber);
-        std::cout << "***The player " << id << " was lucky***" << std::endl;
-        card->fillCell(res);
-        printCard(card);
-    }catch(std::invalid_argument& e) {
-        std::cout << "***No luck. You'll be lucky next time :)***" << std::endl;
+void Lotto::makeTurn() {
+    std::unique_lock<std::mutex> lg(m);
+
+    if(box->isEmpty()) {
+
+        printArgs(COLOR_RED, "===ᐅThe box is empty. Play again?",
+                  LottoUtils::vecToString(win_numbers), "ᐊ===");
+
+        takeInput = true;
+        cv.notify_one();
+        cv.wait(lg, [&] {return input->isContinue();});
+        input->setContinue(false);
+        if(isFinish){ return;}
+        play_game();
+        return;
+    }
+    for(auto idx = 0; idx < input->getSizeOfWinSequence(); idx++){
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        bool pl = false;
+
+        printLine();
+        size_t keg = box->randomKeg();
+        win_numbers.push_back(keg);
+
+        for (auto& player: numbers) {
+            if(LottoUtils::checkContainingElement(player.second, keg)){
+                pl = true;
+                printArgs(
+                        COLOR_GREEN, "===ᐅPlayer ", player.first,  " was lucky: ",
+                        getPlayerMatchNumbers(player.second));
+            }
+        }
+        if(!pl){
+            printArgs(COLOR_RED, "===ᐅThere was no lucky person for this numberᐊ===");
+        }
+    }
+    printLine();
+    std::string &basicString = checkWinner();
+    if(basicString.empty()){
+
+        printArgs(COLOR_RED, "===ᐅThere was no lucky person for this chain: ",
+                  LottoUtils::vecToString(win_numbers), "ᐊ===");
+        printArgs(COLOR_BLUE, "===ᐅType yes to continue, no for quit:ᐊ===");
+
+        takeInput = true;
+        cv.notify_one();
+        cv.wait(lg, [&] {return input->isContinue();});
+        input->setContinue(false);
+        if(isFinish){ return;}
+        win_numbers.clear();
+
+    }else{
+        printArgs(COLOR_CYAN, "===ᐅ", basicString,
+                  " WINᐊ===");
+        printOne(COLOR_BLUE, "===ᐅPlay again?ᐊ===\n");
+
+        takeInput = true;
+        cv.notify_one();
+        cv.wait(lg, [&] {return input->isContinue();});
+        input->setContinue(false);
+        if(isFinish){ return;}
+        win_numbers.clear();
+        numbers.clear();
+        play_game();
     }
 
+
 }
 
-void Lotto::printCard(std::unique_ptr<ScoreCard>& card) {
-    std::cout << *card;
-}
 
-void Lotto::handleCards() {
-    std::cout << HANDLING_CARDS << std::endl;
-
-    for(auto& card: scoreCards){
-        sleep(1);
-        std::cout <<"\n***" << card->getIdentifier() << "'s card****\n" << std::endl;
-        printCard(card);
+void Lotto::closeNumbers() {
+    for(auto idx = 0; idx < input->getNumberOfPlayers(); idx++){
+        printCard(scoreCard);
+        std::string id = input->getIdentifiers()[idx];
+        std::vector<size_t> vector = input->parseTurn(scoreCard, id);
+        printArgs(COLOR_RED, "Filled numbers: ", LottoUtils::vecToString(vector));
+        numbers.emplace_back(id, vector);
     }
 }
+
+std::string& Lotto::checkWinner() {
+    bool flag = true;
+    static std::string res;
+    for (auto& player: numbers) {
+        for(auto num: player.second){
+            if(!LottoUtils::checkContainingElement(win_numbers, num)){
+                flag = false;
+            }
+        }
+        if(flag){
+            res = player.first;
+            break;
+        }
+    }
+    return res;
+}
+
+bool Lotto::isFinished() {
+    return isFinish;
+}
+
+void Lotto::parseInput() {
+    std::unique_lock<std::mutex> lk(m);
+    cv.wait(lk, [&] {return takeInput;});
+    takeInput = false;
+    isFinish = input->parseInput();
+    cv.notify_one();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

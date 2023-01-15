@@ -11,38 +11,55 @@
 #include <ostream>
 #include "Cell.h"
 
+/**
+ * Class represents score card with numbers
+ */
 class ScoreCard {
 public:
 
     ScoreCard() = default;
-    ScoreCard(std::string& id, size_t wdh, size_t hgth);
+    ScoreCard(size_t wdh, size_t hgth);
     ScoreCard(const ScoreCard&);
     ScoreCard(ScoreCard&&) noexcept ;
     ScoreCard& operator=(const ScoreCard&);
     ScoreCard& operator=(ScoreCard&&) noexcept;
 
+    /**
+     * Returns score card width
+     * @return score card width
+     */
     size_t getWidth() const;
+
+    /**
+     * Returns score card height
+     * @return score card height
+     */
     size_t getHeight() const;
-    size_t getTotalNumbersInRow() const;
-    const std::string &getIdentifier() const;
-    size_t searchCell(size_t ) const;
-    void addCell(Cell* cell);
-    void fillCell(size_t idx);
+
+    /**
+     * Add cell to score card
+     * @param value cell value to add
+     */
+    void addCell(const size_t value);
+    /**
+     * Swap current score card with specified score card.
+     */
     void swap(ScoreCard&);
 
-
     friend std::ostream& operator<<(std::ostream& out, ScoreCard& scoreCard);
+
+    /**
+     * Returns cells from score card
+     * @return cells from score card
+     */
+    const std::vector<std::unique_ptr<Cell>> &getCells() const;
+
 private:
 
     size_t width;
     size_t height;
-    size_t quantityOfBorders;
     size_t totalCharactersQuantityInRow;
-
-    std::string identifier;
-
     std::vector<std::unique_ptr<Cell>> cells;
-
 };
 
 

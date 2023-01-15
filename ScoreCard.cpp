@@ -7,16 +7,15 @@
 #include "ScoreCard.h"
 #include "Constants.h"
 #include "LottoUtils.h"
+#include "OutputMaker.h"
 
-ScoreCard::ScoreCard(std::string& id, size_t wdh, size_t hgth) :width (wdh), height(hgth), identifier(id){
-        quantityOfBorders = width + 1;
+
+ScoreCard::ScoreCard(size_t wdh, size_t hgth) :width (wdh), height(hgth){
 
         totalCharactersQuantityInRow =
         width
         *
-        THE_QUANTITY_OF_CELL_CHARACTERS
-        +
-        quantityOfBorders;
+        THE_QUANTITY_OF_CELL_CHARACTERS;
 }
 
 size_t ScoreCard::getWidth() const {
@@ -28,70 +27,53 @@ size_t ScoreCard::getHeight() const {
 }
 
 
-size_t ScoreCard::getTotalNumbersInRow() const {
-    return totalCharactersQuantityInRow;
-}
+std::ostream &operator<<(std::ostream &out, ScoreCard& scoreCard) {
 
-
-std::ostream &operator<<(std::ostream &out, ScoreCard &scoreCard) {
     if(scoreCard.cells.empty()){
-        out << "ScoreCard cells field is  empty" << std::endl;
+        out << "ScoreCard cells  is  empty" << std::endl;
         return out;
     }
+    resetConsole();
+    std::ostringstream ss;
 
     //Add -
-    for(size_t w_idx = 0; w_idx < scoreCard.totalCharactersQuantityInRow; ++w_idx){
-        out<<"-";
+    for(size_t w_idx = 0; w_idx < scoreCard.width*2; ++w_idx){
+        ss<<"－";
     }
-    out<<std::endl;
+    ss<<std::endl;
 
     //Add numbers and |
-    for(size_t idx = 0; idx <= scoreCard.height * scoreCard.width - 1; ++idx){
+    for(size_t idx = 0; idx <= scoreCard.height * scoreCard.width-1; ++idx) {
 
         size_t val = scoreCard.cells[idx]->getCellValue();
+        ss << '|';
 
-        const size_t digitsCount = LottoUtils::findDigitsCount(val);
-        const size_t W = THE_QUANTITY_OF_CELL_CHARACTERS - digitsCount + 1;
-
-        out<< "|" << std::setw(3);
-
-        //When cell is not fiilled
-        if(!scoreCard.cells[idx]->getFilled()) {
-            if (val != 0) {
-                out  << val << " ";
-            } else {
-                out << ' ' << " ";
-            }
+        if (val != 0) {
+            const size_t digitsCount = LottoUtils::findDigitsCount(val);
+            ss << std::right << std::setw(W_FOR_NOT_0 - digitsCount * 2);
+            ss << COLOR_RED << val;
+            ss << ' ' << ANSI_COLOR_RESET;
         }
-
-        //When cell is filled
-        else{
-            out << 'X' << " ";
-        }
-
 
         if((idx + 1)%scoreCard.width == 0){
-            out <<"|"<< std::endl;
+            ss <<'|'<< std::endl;
             //Add the line between the rows
-            for (size_t w_idx = 0; w_idx < scoreCard.totalCharactersQuantityInRow ; ++w_idx) {
-                out << "-";
+            //Add -
+            for(size_t w_idx = 0; w_idx < scoreCard.width*2; ++w_idx){
+                ss<<"－";
             }
-            out << std::endl;
+            ss << std::endl;
         }
-
-
     }
+    out << ss.str();
     return out;
-
 }
 
-void ScoreCard::addCell(Cell *cell) {
-    cells.push_back(std::make_unique<Cell>(*cell));
+
+void ScoreCard::addCell(const size_t value) {
+    cells.push_back(std::make_unique<Cell>(value));
 }
 
-void ScoreCard::fillCell(size_t idx) {
-    cells[idx]->fillCell();
-}
 
 
 void ScoreCard::swap(ScoreCard & rhs) {
@@ -99,18 +81,16 @@ void ScoreCard::swap(ScoreCard & rhs) {
     swap(this->width, rhs.width);
     swap(this->height , rhs.height);
     swap(this->totalCharactersQuantityInRow ,rhs.totalCharactersQuantityInRow);
-    swap(this->quantityOfBorders, rhs.quantityOfBorders);
     swap(this->cells, rhs.cells);
 }
 
 ScoreCard::ScoreCard(const ScoreCard & rhs):
 width(rhs.width)
 , height(rhs.height)
-, totalCharactersQuantityInRow(rhs.totalCharactersQuantityInRow),
-quantityOfBorders(rhs.quantityOfBorders)
+, totalCharactersQuantityInRow(rhs.totalCharactersQuantityInRow)
 {
     for(auto& cell: rhs.cells){
-        this->addCell(cell.get());
+        this->addCell(cell->getCellValue());
     }
 }
 
@@ -119,7 +99,6 @@ ScoreCard &ScoreCard::operator=(const ScoreCard &rhs) {
     this->swap(temp);
     return *this;
 }
-
 
 ScoreCard::ScoreCard(ScoreCard && rhs) noexcept {
     ScoreCard temp;
@@ -133,21 +112,9 @@ ScoreCard &ScoreCard::operator=(ScoreCard && rhs) noexcept {
     return *this;
 }
 
-const std::string &ScoreCard::getIdentifier() const {
-    return identifier;
-}
 
-size_t ScoreCard::searchCell(size_t num) const {
-    auto it = std::find_if(
-            cells.begin(),
-            cells.end(),
-            [&num](const std::unique_ptr<Cell>& ptr) { return ptr->getCellValue() == num;});
-
-    if(it != cells.end()){
-        auto index = std::distance(cells.begin(), it);
-        return index;
-    }
-    throw std::invalid_argument(std::to_string(num) + " does not exist in score card");
+const std::vector<std::unique_ptr<Cell>> &ScoreCard::getCells() const {
+    return cells;
 }
 
 
